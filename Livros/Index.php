@@ -7,29 +7,29 @@ require_once("util/Conexao.php");
 
 $con = Conexao::getConexao();
 
-//Buscar livros já salvos no banco de dados
+// Buscar livros já salvos no banco de dados
 $sql = "SELECT * FROM livros";
 $stm = $con->prepare($sql);
 $stm->execute();
 $livros = $stm->fetchAll();
-echo "<pre>" . print_r($livros, true) . "</pre>";
+//echo "<pre>" . print_r($livros, true) . "</pre>";
 
-//verificar se o usuario já clicou no gravar;
+// Verificar se o usuário já clicou no gravar
 if (isset($_POST["titulo"])) {
-
-    //obter os valores digitados pelo usuario
-
+    // Obter os valores digitados pelo usuário
     $titulo = $_POST["titulo"];
     $genero = $_POST["genero"];
     $paginas = $_POST["paginas"];
+    $autor = $_POST["autor"];
 
-    //Inserir as informações na base de dados
-
-    $sql = "INSERT INTO livros (titulo, genero, qtd_paginas)
-            VALUES(? , ? , ?)";
-
+    // Inserir as informações na base de dados
+    $sql = "INSERT INTO livros (titulo, genero, qtd_paginas, autor)
+            VALUES (?, ?, ?, ?)";
     $stm = $con->prepare($sql);
-    $stm->execute([$titulo, $genero, $paginas]);
+    $stm->execute([$titulo, $genero, $paginas, $autor]);
+
+    // Redirecionar para a mesma página a fim de limpar o buffer do navegador
+    header("location: Index.php");
 }
 
 ?>
@@ -40,7 +40,6 @@ if (isset($_POST["titulo"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de livros</title>
-
 </head>
 
 <body>
@@ -50,31 +49,47 @@ if (isset($_POST["titulo"])) {
     <table border="1">
         <tr>
             <th>ID</th>
-            <th>Coluna</th>
+            <th>Título</th>
             <th>Gênero</th>
             <th>Páginas</th>
+            <th>Autor</th>
+            <th>Excluir</th>
         </tr>
 
-        <?php
-        foreach ($livros as $l) : ?>
+        <?php foreach ($livros as $l) : ?>
             <tr>
-                <td><?php echo $l['id'] ?></td>
-                <td><?php echo $l['titulo'] ?></td>
-                <td><?php echo $l['genero'] ?></td>
-                <td><?php echo $l['qtd_paginas'] ?></td>
+                <td><?php echo $l['id']; ?></td>
+                <td><?php echo $l['titulo']; ?></td>
+                <td>
+                    <?php
+                    if ($l["genero"] == 'D') {
+                        echo 'Drama';
+                    } else if ($l["genero"] == 'O') {
+                        echo 'Outro';
+                    } else if ($l["genero"] == 'R') {
+                        echo 'Romance';
+                    } else if ($l["genero"] == 'F') {
+                        echo 'Ficção';
+                    }
+                    ?>
+                </td>
+                <td><?php echo $l['qtd_paginas']; ?></td>
+                <td><?php echo $l['autor']; ?></td>
+                <td><a href="excluir.php?id=<?= $l['id'] ?>"
+                        onclick="return confirm('Confirma a exclusão')">excluir</a></td>
             </tr>
-
         <?php endforeach; ?>
     </table>
 
     <h1>Formulário</h1>
 
     <form action="" method="post">
-
         <div style="margin-bottom: 10px;">
-            <label for="titulo">Titulo:</label>
+            <label for="titulo">Título:</label>
             <input type="text" name="titulo" id="titulo">
         </div>
+
+
 
         <div style="margin-bottom: 10px;">
             <label for="genero">Gênero:</label>
@@ -84,13 +99,23 @@ if (isset($_POST["titulo"])) {
                 <option value="F">Ficção</option>
                 <option value="R">Romance</option>
                 <option value="O">Outro</option>
+
             </select>
         </div>
 
         <div style="margin-bottom: 10px;">
             <label for="paginas">Páginas:</label>
             <input type="number" name="paginas" id="paginas">
+
         </div>
+
+        <div style="margin-bottom: 10px;">
+
+            <label for="autor">Autor:</label>
+            <input type="text" name="autor" id="autor">
+
+        </div>
+
         <div>
             <button type="submit">Gravar</button>
         </div>
