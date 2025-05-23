@@ -17,7 +17,7 @@ class Conexao
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             );
             self::$conn = new PDO(
-                "mysql:host=localhost;dbname=biblioteca",
+                "mysql:host=localhost;dbname=db_livros",
                 "root",
                 "bancodedados",
                 $opcoes
