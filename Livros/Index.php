@@ -14,6 +14,8 @@ $stm->execute();
 $livros = $stm->fetchAll();
 //echo "<pre>" . print_r($livros, true) . "</pre>";
 
+$msgErro = '';
+
 // Verificar se o usuário já clicou no gravar
 if (isset($_POST["titulo"])) {
     // Obter os valores digitados pelo usuário
@@ -22,16 +24,40 @@ if (isset($_POST["titulo"])) {
     $paginas = $_POST["paginas"];
     $autor = $_POST["autor"];
 
-    // Inserir as informações na base de dados
-    $sql = "INSERT INTO livros (titulo, genero, qtd_paginas, autor)
-            VALUES (?, ?, ?, ?)";
-    $stm = $con->prepare($sql);
-    $stm->execute([$titulo, $genero, $paginas, $autor]);
+    //Validar os dados
 
-    // Redirecionar para a mesma página a fim de limpar o buffer do navegador
-    header("location: Index.php");
+    $erros = array();
+    if(! $titulo){
+        array_push($erros, 'Informe o titulo!');
+    }
+    if(! $autor){
+        array_push($erros, 'Informe o autor!');
+    }
+    if(! $genero){
+        array_push($erros, 'Informe o gênero!');
+    }
+    if(! $paginas){
+        array_push($erros, 'Informe a quantidade de páginas!');
+    }else if()
+    if($paginas <= 0){
+        array_push($erros, 'Informe paginas maiores que 0!');
+    }
+    if(count($erros)==0){  
+        
+        // Inserir as informações na base de dados
+        $sql = "INSERT INTO livros (titulo, genero, qtd_paginas, autor)
+                VALUES (?, ?, ?, ?)";
+        $stm = $con->prepare($sql);
+        $stm->execute([$titulo, $genero, $qtd_paginas, $autor]);
+        
+        // Redirecionar para a mesma página a fim de limpar o buffer do navegador
+        header("location: Index.php");
+    }else{
+        $msgErro = implode("<br>", $erros);
+        
+    }
 }
-
+  
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -83,7 +109,8 @@ if (isset($_POST["titulo"])) {
 
     <h1>Formulário</h1>
 
-    <form action="" method="post">
+    <!--<form action="" method="post" onsubmit="return validar();">-->
+    <form action="" method="post" >
         <div style="margin-bottom: 10px;">
             <label for="titulo">Título:</label>
             <input type="text" name="titulo" id="titulo">
@@ -119,7 +146,13 @@ if (isset($_POST["titulo"])) {
         <div>
             <button type="submit">Gravar</button>
         </div>
+        <div id="div-erro" style= "color:red";>
+            <?= $msgErro?>
+    
+        </div>
     </form>
+
+    <script src = "js/validacao.js"></script>
 
 </body>
 
