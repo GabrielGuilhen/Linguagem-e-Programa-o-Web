@@ -15,49 +15,64 @@ $livros = $stm->fetchAll();
 //echo "<pre>" . print_r($livros, true) . "</pre>";
 
 $msgErro = '';
+$titulo = "";
+$autor = "";
+$qtd_paginas = "";
+$genero = "";
+
 
 // Verificar se o usuário já clicou no gravar
 if (isset($_POST["titulo"])) {
     // Obter os valores digitados pelo usuário
-    $titulo = $_POST["titulo"];
-    $genero = $_POST["genero"];
-    $paginas = $_POST["paginas"];
-    $autor = $_POST["autor"];
+    //trim tira os espaços do inicio e final
+    $titulo = trim($_POST["titulo"]);
+    $genero  = trim($_POST["genero"]);
+    $qtd_paginas = ($_POST["paginas"]);
+    $autor = ($_POST["autor"]);
 
     //Validar os dados
 
     $erros = array();
-    if(! $titulo){
+    if (! $titulo) {
         array_push($erros, 'Informe o titulo!');
+    } else if (strlen($titulo) < 3 || strlen($titulo) > 50) {
+        array_push($erros, 'O titulo deve ser entre 3 e 50 caracteres!');
+    }else{
+        $sql = "SELECT id FROM livros WHERE titulo = ?";
+        $stm = $con->prepare($sql);
+        $stm->execute([$titulo]);
+        $result = $stm->fetchAll();
+
+        if (count($result) > 0) {
+            array_push($erros,"Já existe um livro com esse titulo!");
+        }
     }
-    if(! $autor){
+    if (! $autor) {
         array_push($erros, 'Informe o autor!');
     }
-    if(! $genero){
+    if (! $genero) {
         array_push($erros, 'Informe o gênero!');
     }
-    if(! $paginas){
+    if (! $qtd_paginas) {
         array_push($erros, 'Informe a quantidade de páginas!');
-    }else if()
-    if($paginas <= 0){
+    } else if ($qtd_paginas <= 0) {
         array_push($erros, 'Informe paginas maiores que 0!');
     }
-    if(count($erros)==0){  
-        
+    if (count($erros) == 0) {
+
         // Inserir as informações na base de dados
         $sql = "INSERT INTO livros (titulo, genero, qtd_paginas, autor)
                 VALUES (?, ?, ?, ?)";
         $stm = $con->prepare($sql);
         $stm->execute([$titulo, $genero, $qtd_paginas, $autor]);
-        
+
         // Redirecionar para a mesma página a fim de limpar o buffer do navegador
         header("location: Index.php");
-    }else{
+    } else {
         $msgErro = implode("<br>", $erros);
-        
     }
 }
-  
+
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -110,10 +125,11 @@ if (isset($_POST["titulo"])) {
     <h1>Formulário</h1>
 
     <!--<form action="" method="post" onsubmit="return validar();">-->
-    <form action="" method="post" >
+    <form action="" method="post">
         <div style="margin-bottom: 10px;">
             <label for="titulo">Título:</label>
-            <input type="text" name="titulo" id="titulo">
+            <input type="text" name="titulo" id="titulo" value="<?php echo $titulo; ?>">
+
         </div>
 
 
@@ -122,37 +138,48 @@ if (isset($_POST["titulo"])) {
             <label for="genero">Gênero:</label>
             <select name="genero" id="genero">
                 <option value="">----Selecione----</option>
-                <option value="D">Drama</option>
-                <option value="F">Ficção</option>
-                <option value="R">Romance</option>
-                <option value="O">Outro</option>
+                <option value="D" <?php if ($genero == "D") {
+                                        echo "selected";
+                                    } ?>>Drama</option>
+
+                <option value="F" <?php if ($genero == "F") {
+                                        echo "selected";
+                                    } ?>>Ficção</option>
+
+                <option value="R" <?php if ($genero == "R") {
+                                        echo "selected";
+                                    } ?>>Romance</option>
+
+                <option value="O" <?php if ($genero == "O") {
+                                        echo "selected";
+                                    } ?>>Outro</option>
 
             </select>
         </div>
 
         <div style="margin-bottom: 10px;">
             <label for="paginas">Páginas:</label>
-            <input type="number" name="paginas" id="paginas">
+            <input type="number" name="paginas" id="paginas" value="<?php echo $qtd_paginas; ?>">
 
         </div>
 
         <div style="margin-bottom: 10px;">
 
             <label for="autor">Autor:</label>
-            <input type="text" name="autor" id="autor">
+            <input type="text" name="autor" id="autor" value="<?php echo $autor; ?>">
 
         </div>
 
         <div>
             <button type="submit">Gravar</button>
         </div>
-        <div id="div-erro" style= "color:red";>
-            <?= $msgErro?>
-    
+        <div id="div-erro" style="color:red" ;>
+            <?= $msgErro ?>
+
         </div>
     </form>
 
-    <script src = "js/validacao.js"></script>
+    <script src="js/validacao.js"></script>
 
 </body>
 
