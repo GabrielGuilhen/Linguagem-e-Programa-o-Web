@@ -1,16 +1,12 @@
 <?php
-// index.php
 
-// Inicia a sessão se não estiver ativa
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Variável para mensagem
 $mensagem = '';
-$tipo_mensagem = ''; // 'success' ou 'danger'
+$tipo_mensagem = '';
 
-// Processa ações via GET
 if (isset($_GET['acao'])) {
     $acao = $_GET['acao'];
     
@@ -58,7 +54,7 @@ if (isset($_GET['acao'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contador utilizando sessão</title>
-    <!-- Bootstrap CSS -->
+  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body {
@@ -145,7 +141,6 @@ if (isset($_GET['acao'])) {
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
